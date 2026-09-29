@@ -1,0 +1,52 @@
+Prompt: Site de controle de amostras grátis – Farmácia da UBS
+Crie um site estático (HTML, CSS e JavaScript puro, sem etapa de build) para ser publicado no GitHub Pages, que controla o estoque de amostras grátis de medicamentos da farmácia de uma UBS. Todo o texto da interface deve estar em português do Brasil.
+Visual
+Colorido, alegre e muito fácil de usar, pensado para quem não tem familiaridade com tecnologia.
+Botões grandes, fonte legível (ex.: Nunito do Google Fonts), cantos arredondados, cabeçalho com degradê (verde → azul-turquesa → roxo).
+Funcionar bem no computador e no celular (responsivo).
+Navegação por abas: Estoque, Adicionar, Retirar, Histórico, Ajustes.
+Mensagens de confirmação e erro em avisos coloridos na parte de baixo da tela.
+Banco de dados
+Usar Firebase Firestore (SDK modular via CDN https://www.gstatic.com/firebasejs/...) com login anônimo automático, para que todos os computadores e celulares vejam o mesmo estoque em tempo real (onSnapshot).
+Coleções: medicamentos e retiradas.
+A configuração do Firebase fica num arquivo separado firebase-config.js. Se estiver vazio, o site deve funcionar em "Modo demonstração", salvando no localStorage do navegador, e mostrar um selo no topo indicando o modo (Online / Demonstração).
+Incluir um arquivo firestore.rules que só permite ler e gravar para usuários autenticados e não permite apagar ou alterar o histórico de retiradas.
+Aba "Adicionar"
+Formulário com:
+Nome do medicamento (obrigatório)
+Dosagem/apresentação (ex.: 50 mg)
+Classe terapêutica identificada automaticamente pelo nome, enquanto a pessoa digita (ex.: Losartana → Anti-hipertensivo; Carbamazepina → Anticonvulsivante). A pessoa pode trocar a classe manualmente. Se não reconhecer, mostrar "Outros" e pedir para escolher.
+Criar um arquivo classes.js com um dicionário de princípios ativos e nomes comerciais comuns em UBS para cerca de 30 classes: anti-hipertensivo, diurético, antidiabético, anticonvulsivante, antidepressivo, ansiolítico/hipnótico, antipsicótico, estabilizador de humor, antibiótico, analgésico/antitérmico, anti-inflamatório, antialérgico, corticoide, respiratório (asma/DPOC), protetor gástrico, antiemético, antiespasmódico, hipolipemiante, antiagregante/anticoagulante, cardiológico, tireoide, hormônio/contraceptivo, vitamina/suplemento, antiparasitário, antifúngico, antiviral, antiparkinsoniano, demência, relaxante muscular, antigotoso, urológico, outros. Cada classe tem uma cor própria usada nas etiquetas.
+A busca deve ignorar acentos e maiúsculas.
+Quantidade (obrigatória) e unidade (caixas, comprimidos, cápsulas, frascos, blisters, ampolas, bisnagas, unidades)
+Data de validade (obrigatória) e lote (opcional)
+Local: Sala 1 ou Sala 2, em dois botões grandes e coloridos
+Se já existir o mesmo remédio com mesma dose, validade, lote, unidade e sala, somar a quantidade em vez de duplicar.
+Avisar se a validade informada já passou.
+Adicionar por foto
+Botão "Tirar ou escolher foto" (abre a câmera do celular).
+O site lê a embalagem e preenche automaticamente nome, dosagem, quantidade (ex.: "30 comprimidos"), validade (procurar perto de "VAL"/"VENC"; aceitar dd/mm/aaaa, mm/aaaa e "MAR/2027") e lote. A pessoa confere antes de salvar; os campos preenchidos piscam em verde.
+Modo padrão gratuito: Tesseract.js (OCR em português) rodando no navegador, com a imagem reduzida e com contraste aumentado antes da leitura.
+Modo opcional mais preciso: se o usuário colar uma chave da API Google Gemini em Ajustes (salva só no localStorage, nunca no código), enviar a foto ao Gemini pedindo JSON com nome, dosagem, unidades por embalagem, unidade, quantas caixas aparecem na foto, validade e lote. Se o Gemini falhar, usar o OCR.
+Aba "Estoque"
+Cartões de resumo no topo: itens em estoque, na Sala 1, na Sala 2, vencem em breve, vencidos.
+Área de destaque "Próximos de vencer": vencidos (vermelho), vencem em até 30 dias (laranja) e vencem dentro do prazo configurado (amarelo), ordenados pela data.
+Lista geral com etiquetas coloridas (classe, sala, situação da validade, lote), busca e filtros por sala, classe e situação, e opção de ocultar esgotados.
+Em cada item: botão Retirar (leva à aba de retirada já com o remédio selecionado) e Editar (janela para alterar ou excluir).
+Botão Baixar planilha (CSV com separador ; e BOM UTF-8, para abrir certinho no Excel).
+Aba "Retirar"
+Campo de busca + lista só com remédios que têm saldo e não estão vencidos, ordenados pelo que vence primeiro.
+Mostrar a quantidade disponível e avisar se existe outro lote do mesmo remédio que vence antes.
+Campos: quantidade retirada, quem retirou (obrigatório, lembrar o último nome digitado), paciente/destino (opcional) e observação.
+Não deixar retirar mais do que há em estoque. A baixa deve usar transação do Firestore para não haver erro quando duas pessoas retiram ao mesmo tempo.
+Cada retirada é gravada em retiradas com data/hora e cópia dos dados do remédio.
+Aba "Histórico"
+Lista das retiradas (mais recentes primeiro) com busca por remédio, pessoa ou paciente e filtro por período (de/até).
+Botão Baixar planilha do histórico.
+Aba "Ajustes"
+Escolher com quantos dias de antecedência avisar o vencimento (30, 60, 90 ou 120; padrão 60).
+Campos da chave e do modelo do Gemini (padrão gemini-2.5-flash).
+Segurança e qualidade
+Escapar todo texto digitado antes de exibir (evitar XSS).
+Código comentado em português e organizado em arquivos: index.html, style.css, app.js, classes.js, foto.js, firebase-config.js, firestore.rules.
+Incluir um README.md em português, com passo a passo simples para: publicar no GitHub Pages; criar o projeto no Firebase (Firestore na região São Paulo, regras, login anônimo, domínio autorizado usuario.github.io); colar a configuração; criar a chave do Gemini; e ensinar novos remédios em classes.js.
